@@ -1,26 +1,29 @@
 {
-    "age": 19,
-    "sex": "male",
-    "weight_kg": 84.0,
-    "height_cm": 160.0,
-    "activity_level": "light",
-    "goal": "lose_weight",
-    "diet_type": "Vegetarian",
+    "age": 21,
+    "sex": "female",
+    "weight_kg": 44.8,
+    "height_cm": 175.0,
+    "activity_level": "very_active",
+    "goal": "gain_weight",
+    "diet_type": "Vegan",
     "allergies": [
-        "potato",
-        "onion"
+        "nuts",
+        "milk",
+        "soya",
+        "soy"
     ],
     "cuisines": {
         "breakfast": [
-            "Fruit"
+            "Indian"
         ],
         "lunch": [
             "Indian"
         ],
         "dinner": [
-            "Italian",
-            "French"
+            "Indian"
         ],
-        "snack": []
+        "snack": [
+            "Indian"
+        ]
     }
 }

@@ -1,10 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Card, Row, Col, Tab, Nav, Button, Modal, Table, Badge } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import { StoreContext } from '../context/StoreContext';
 
-const MealPlanResults = ({ userProfile, mealPlan }) => {
+const MealPlanResults = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { url, token } = useContext(StoreContext);
+  
+  // Get data from navigation state
+  const responseData = location.state?.mealPlan;
+  const userProfile = responseData?.userProfile;
+  const mealPlan = responseData?.mealPlan;
   const [showModal, setShowModal] = useState(false);
   const [selectedFood, setSelectedFood] = useState(null);
   const [savingPlan, setSavingPlan] = useState(false);
@@ -12,10 +20,11 @@ const MealPlanResults = ({ userProfile, mealPlan }) => {
 
   // Use useEffect to handle navigation
   useEffect(() => {
-    if (!mealPlan || !userProfile) {
-      navigate('/profile');
+    if (!responseData || !mealPlan || !userProfile) {
+      console.error('Missing meal plan data, redirecting to diet planner');
+      navigate('/diet-planner');
     }
-  }, [mealPlan, userProfile, navigate]);
+  }, [responseData, mealPlan, userProfile, navigate]);
 
   useEffect(() => {
     console.log("Meal plan received:", mealPlan);
@@ -24,8 +33,15 @@ const MealPlanResults = ({ userProfile, mealPlan }) => {
   }, [mealPlan]);
 
   // If data is missing, render nothing while the redirect happens
-  if (!mealPlan || !userProfile) {
-    return null;
+  if (!responseData || !mealPlan || !userProfile) {
+    return (
+      <div className="text-center py-5">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+        <p className="mt-3">Loading meal plan...</p>
+      </div>
+    );
   }
 
   const handleFoodClick = (food) => {
@@ -34,14 +50,31 @@ const MealPlanResults = ({ userProfile, mealPlan }) => {
   };
 
   const handleSavePlan = async () => {
+    if (!token) {
+      alert('Please login to save meal plans');
+      return;
+    }
+    
     setSavingPlan(true);
     try {
-      await axios.post('/api/save-meal-plan', { userProfile, mealPlan });
-      setSavingPlan(false);
-      setSaveSuccess(true);
-      setTimeout(() => setSaveSuccess(false), 3000);
+      const response = await axios.post(
+        `${url}/api/meal-plans/save`,
+        { userProfile, mealPlan },
+        { headers: { token } }
+      );
+      
+      if (response.data.success) {
+        setSaveSuccess(true);
+        setTimeout(() => {
+          setSaveSuccess(false);
+          // Optionally navigate to saved plans
+          // navigate('/saved-plans');
+        }, 2000);
+      }
     } catch (error) {
       console.error('Error saving meal plan:', error);
+      alert('Failed to save meal plan. Please try again.');
+    } finally {
       setSavingPlan(false);
     }
   };

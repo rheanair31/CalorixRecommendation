@@ -10,12 +10,12 @@ const app = express();
 
 // Middleware
 app.use(cors({
-    origin: 'http://your-frontend-url.com',  // Update with your frontend URL for security
+    origin: 'http://localhost:5173/',  // Update with your frontend URL for security
 }));
 app.use(express.json());
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/bytes', {
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/Calorix', {
     useNewUrlParser: true,
     useUnifiedTopology: true
 })

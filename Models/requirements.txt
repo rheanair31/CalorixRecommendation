@@ -1,0 +1,13 @@
+# Calorix Recommendation System - Python Dependencies
+
+# Core ML Libraries
+scikit-learn==1.6.1
+pandas>=1.5.0
+numpy>=1.23.0
+
+# Web Framework
+Flask>=2.3.0
+Flask-CORS>=4.0.0
+
+# Additional utilities
+python-dateutil>=2.8.0

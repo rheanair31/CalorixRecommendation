@@ -4,11 +4,14 @@ import "./index.css";
 
 import { BrowserRouter } from "react-router-dom";
 import StoreContextProvider from "./context/StoreContext.jsx";
+import { DashboardRefreshProvider } from "./context/DashboardRefreshContext.jsx";
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <StoreContextProvider>
-      <App />
+      <DashboardRefreshProvider>
+        <App />
+      </DashboardRefreshProvider>
     </StoreContextProvider>
   </BrowserRouter>
 );

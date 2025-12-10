@@ -16,7 +16,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 app = Flask(__name__)
 # Configure CORS to allow requests from your React frontend
-CORS(app, resources={r"/*": {"origins": ["http://localhost:5173", "http://127.0.0.1:5173"]}})
+CORS(app)
 
 # Set upload folder
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -30,7 +30,7 @@ except Exception as e:
     model = None
 
 # Gemini API configuration
-GEMINI_API_KEY = "AIzaSyA2lqZZ_H3JmlAVLhiahjM0mo5qsFMZrsA"  # Your actual key
+GEMINI_API_KEY = "AIzaSyBj7z3tFPHMKClpI_BdAt3Z5DqZmc6pXsg"  # Your actual key
 GEMINI_API_URL = (
     f"https://generativelanguage.googleapis.com/v1beta/models/"
     f"gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"

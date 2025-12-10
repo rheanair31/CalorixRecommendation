@@ -3,9 +3,11 @@ import "./LoginPopup.css";
 import { assets } from "../../assets/assets";
 import { StoreContext } from "../../context/StoreContext";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const LoginPopup = ({ setShowLogin }) => {
   const { url, setToken } = useContext(StoreContext);
+  const navigate = useNavigate();
 
   const [currState, setCurrState] = useState("Sign Up");
   const [data, setData] = useState({
@@ -24,12 +26,11 @@ const LoginPopup = ({ setShowLogin }) => {
     event.preventDefault();
 
     if (!url) {
-      console.error("API base URL is missing.");
+      alert("API URL is missing.");
       return;
     }
 
-    let newUrl =
-      url + (currState === "Login" ? "/api/user/login" : "/api/user/register");
+    let newUrl = url + (currState === "Login" ? "/api/user/login" : "/api/user/register");
 
     try {
       const response = await axios.post(newUrl, data);
@@ -38,33 +39,17 @@ const LoginPopup = ({ setShowLogin }) => {
         setToken(response.data.token);
         localStorage.setItem("token", response.data.token);
         setShowLogin(false);
+        
+        // Navigate to profile page after successful login/signup
+        navigate("/profile");
       } else {
         alert(response.data.message);
       }
     } catch (error) {
       console.error("Error during login/signup:", error);
+      alert("An error occurred. Please try again.");
     }
   };
-
-  // const onLogin = async (event) => {
-  //   event.preventDefault();
-  //   let newUrl = url;
-  //   if (currState === "Login") {
-  //     newUrl += "api/user/login";
-  //   } else {
-  //     newUrl += "api/user/register";
-  //   }
-
-  //   const response = await axios.post(newUrl, data);
-
-  //   if (response.data.success) {
-  //     setToken(response.data.token);
-  //     localStorage.setItem("token", response.data.token);
-  //     setShowLogin(false);
-  //   } else {
-  //     alert(response.data.message);
-  //   }
-  // };
 
   return (
     <div className="login-popup">
@@ -74,13 +59,11 @@ const LoginPopup = ({ setShowLogin }) => {
           <img
             onClick={() => setShowLogin(false)}
             src={assets.cross_icon}
-            alt=""
+            alt="close"
           />
         </div>
         <div className="login-popup-inputs">
-          {currState === "Login" ? (
-            <></>
-          ) : (
+          {currState === "Sign Up" && (
             <input
               name="name"
               onChange={onChangeHandler}
@@ -90,7 +73,6 @@ const LoginPopup = ({ setShowLogin }) => {
               required
             />
           )}
-
           <input
             name="email"
             onChange={onChangeHandler}
@@ -113,11 +95,11 @@ const LoginPopup = ({ setShowLogin }) => {
         </button>
         <div className="login-popup-condition">
           <input type="checkbox" required />
-          <p>By continuing, I agree to the terms of use & privacy policy</p>
+          <p>By continuing, I agree to the terms of use & privacy policy.</p>
         </div>
         {currState === "Login" ? (
           <p>
-            Create new account?{" "}
+            Create a new account?{" "}
             <span onClick={() => setCurrState("Sign Up")}>Click here</span>
           </p>
         ) : (

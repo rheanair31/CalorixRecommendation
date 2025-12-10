@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Card, Table, Button, Badge, Spinner, Alert } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaLeaf, FaDrumstickBite, FaClipboardList } from 'react-icons/fa';
 import axios from 'axios';
+import { StoreContext } from '../context/StoreContext';
 import './SavedMealPlans.css';
 
 const SavedMealPlans = () => {
+  const { url, token } = useContext(StoreContext);
+  const navigate = useNavigate();
   const [savedPlans, setSavedPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -16,11 +19,24 @@ const SavedMealPlans = () => {
   }, []);
 
   const fetchSavedPlans = async () => {
+    if (!token) {
+      setError('Please login to view saved meal plans');
+      setLoading(false);
+      return;
+    }
+    
     setLoading(true);
     try {
-      const response = await axios.get('/api/saved-meal-plans');
-      const plans = Array.isArray(response.data) ? response.data : [];
-      setSavedPlans(plans);
+      const response = await axios.get(`${url}/api/meal-plans/saved`, {
+        headers: { token }
+      });
+      
+      if (response.data.success) {
+        const plans = Array.isArray(response.data.mealPlans) ? response.data.mealPlans : [];
+        setSavedPlans(plans);
+      } else {
+        setSavedPlans([]);
+      }
       setLoading(false);
     } catch (err) {
       console.error('Error fetching saved plans:', err);
@@ -31,16 +47,31 @@ const SavedMealPlans = () => {
   };
 
   const handleDeletePlan = async (planId) => {
+    if (!token) {
+      alert('Please login to delete meal plans');
+      return;
+    }
+    
+    if (!window.confirm('Are you sure you want to delete this meal plan?')) {
+      return;
+    }
+    
     setDeleteLoading(planId);
     try {
-      await axios.delete(`/api/saved-meal-plans/${planId}`);
-      setSavedPlans(prevPlans => {
-        const plans = Array.isArray(prevPlans) ? prevPlans : [];
-        return plans.filter(plan => plan._id !== planId);
+      const response = await axios.delete(`${url}/api/meal-plans/saved/${planId}`, {
+        headers: { token }
       });
+      
+      if (response.data.success) {
+        setSavedPlans(prevPlans => {
+          const plans = Array.isArray(prevPlans) ? prevPlans : [];
+          return plans.filter(plan => plan._id !== planId);
+        });
+      }
       setDeleteLoading(null);
     } catch (err) {
       console.error('Error deleting plan:', err);
+      alert('Failed to delete meal plan. Please try again.');
       setDeleteLoading(null);
     }
   };
@@ -150,8 +181,14 @@ const SavedMealPlans = () => {
                         <Button 
                           variant="outline-primary" 
                           size="sm" 
-                          as={Link}
-                          to={`/meal-plan/${plan._id}`}
+                          onClick={() => navigate('/meal-plan', { 
+                            state: { 
+                              mealPlan: { 
+                                userProfile: plan.userProfile, 
+                                mealPlan: plan.mealPlan 
+                              } 
+                            } 
+                          })}
                         >
                           View
                         </Button>

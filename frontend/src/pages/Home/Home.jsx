@@ -4,8 +4,8 @@ import { StoreContext } from '../../context/StoreContext';
 import { FaUtensils, FaChartLine, FaBrain, FaCamera, FaHeart, FaLeaf, FaSeedling, FaUserFriends, FaSave } from 'react-icons/fa';
 import './Home.css';
 
-const Home = () => {
-  const { setShowLogin } = useContext(StoreContext);
+const Home = ({ setShowLogin }) => {
+  const { token } = useContext(StoreContext);
 
   const handleGetStarted = () => {
     setShowLogin(true);

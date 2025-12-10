@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Cleanup Tool</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .error {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        button {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #c82333;
+        }
+        button.secondary {
+            background: #6c757d;
+        }
+        button.secondary:hover {
+            background: #5a6268;
+        }
+        button.success {
+            background: #28a745;
+        }
+        button.success:hover {
+            background: #218838;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .info {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        #result {
+            margin-top: 20px;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧹 Database Cleanup Tool</h1>
+        <p>Fix the exercise entry with wrong year (2025 instead of 2024)</p>
+
+        <div class="warning">
+            <strong>⚠️ Warning:</strong> This will delete or fix the exercise entry with year 2025.
+        </div>
+
+        <div class="info">
+            <strong>Entry to be removed:</strong>
+            <pre>ID: 693250ff32b80983bbaf3b6e
+Date: 2025-12-05 (should be 2024-12-05)
+Exercise: Swimming, 30 minutes
+Calories: 400</pre>
+        </div>
+
+        <div class="button-group">
+            <button onclick="deleteEntry()" class="danger">
+                Delete Entry
+            </button>
+            <button onclick="checkEntry()" class="secondary">
+                Check if Entry Exists
+            </button>
+            <button onclick="verifyToday()" class="success">
+                Verify Today's Data
+            </button>
+        </div>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:4000';
+        const ENTRY_ID = '693250ff32b80983bbaf3b6e';
+
+        function getToken() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                showError('No token found. Please login first.');
+                return null;
+            }
+            return token;
+        }
+
+        function showResult(html) {
+            document.getElementById('result').innerHTML = html;
+        }
+
+        function showSuccess(message) {
+            showResult(`<div class="success">${message}</div>`);
+        }
+
+        function showError(message) {
+            showResult(`<div class="error">${message}</div>`);
+        }
+
+        function showInfo(message) {
+            showResult(`<div class="info">${message}</div>`);
+        }
+
+        async function deleteEntry() {
+            const token = getToken();
+            if (!token) return;
+
+            if (!confirm('Are you sure you want to delete this entry?')) {
+                return;
+            }
+
+            showInfo('<div class="loading"></div> Deleting entry...');
+
+            try {
+                const response = await fetch(`${API_URL}/api/exercise/${ENTRY_ID}`, {
+                    method: 'DELETE',
+                    headers: { token }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess(`✅ Entry deleted successfully!<br><br>
+                        <strong>Next steps:</strong><br>
+                        1. Refresh your dashboard<br>
+                        2. Verify the exercise no longer shows<br>
+                        3. If it still shows, restart the backend server`);
+                } else {
+                    showError(`❌ Failed to delete: ${data.message}`);
+                }
+            } catch (error) {
+                showError(`❌ Error: ${error.message}<br><br>
+                    Make sure your backend server is running on port 4000.`);
+            }
+        }
+
+        async function checkEntry() {
+            const token = getToken();
+            if (!token) return;
+
+            showInfo('<div class="loading"></div> Checking entry...');
+
+            try {
+                const response = await fetch(`${API_URL}/api/exercise/daily?date=2025-12-05`, {
+                    headers: { token }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const entry = data.entries.find(e => e._id === ENTRY_ID);
+                    if (entry) {
+                        showError(`❌ Entry still exists:<br><br>
+                            <pre>${JSON.stringify(entry, null, 2)}</pre>
+                            <br>Click "Delete Entry" to remove it.`);
+                    } else {
+                        showSuccess('✅ Entry not found in Dec 5, 2025 data. It may have been deleted already.');
+                    }
+                } else {
+                    showInfo('ℹ️ Could not fetch entry data. It may have been deleted.');
+                }
+            } catch (error) {
+                showError(`❌ Error: ${error.message}`);
+            }
+        }
+
+        async function verifyToday() {
+            const token = getToken();
+            if (!token) return;
+
+            showInfo('<div class="loading"></div> Checking today\'s data...');
+
+            try {
+                const response = await fetch(`${API_URL}/api/exercise/daily`, {
+                    headers: { token }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD format
+                    const count = data.entries.length;
+                    const duration = data.total_duration_minutes || 0;
+
+                    showSuccess(`✅ Today's Data (${today}):<br><br>
+                        <strong>Exercises logged:</strong> ${count}<br>
+                        <strong>Total duration:</strong> ${duration} minutes<br>
+                        <strong>Calories burned:</strong> ${data.total_calories_burned || 0}<br><br>
+                        ${count === 0 ? '✅ No exercise logged yet today.' : ''}
+                        ${count > 0 ? '<strong>Entries:</strong><pre>' + JSON.stringify(data.entries, null, 2) + '</pre>' : ''}`);
+                } else {
+                    showError(`❌ Failed to fetch today's data: ${data.message}`);
+                }
+            } catch (error) {
+                showError(`❌ Error: ${error.message}<br><br>
+                    Make sure your backend server is running on port 4000.`);
+            }
+        }
+
+        // Auto-check on load
+        window.addEventListener('load', () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                showError('❌ No authentication token found.<br><br>Please login to your application first, then come back to this page.');
+            } else {
+                showInfo('✅ Token found. You can now use the cleanup tools.');
+            }
+        });
+    </script>
+</body>
+</html>

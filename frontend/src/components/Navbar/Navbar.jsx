@@ -14,6 +14,7 @@ const Navbar = ({ setShowLogin }) => {
   const handleLogout = () => {
     setToken("");
     localStorage.removeItem("token");
+    localStorage.removeItem("profileComplete");
     navigate("/");
   };
 
@@ -31,48 +32,47 @@ const Navbar = ({ setShowLogin }) => {
         <nav className="navbar">
           <div className="navbar-container">
             <Link to="/" className="navbar-brand">
-              <span style={{ fontSize: '2rem' }}>Bytes Diet Planner</span>
+              <span style={{ fontSize: '2rem' }}>Calorix Diet Planner</span>
             </Link>
             
             <div className="navbar-links">
-              <Link 
-                to="/" 
-                className={`nav-link ${isActive('/') ? 'active' : ''}`}
-              >
-                Home
-              </Link>
-              <Link 
-                to="/profile" 
-                className={`nav-link ${isActive('/profile') ? 'active' : ''}`}
-              >
-                Create Plan
-              </Link>
-              <Link 
-                to="/log-food" 
-                className={`nav-link ${isActive('/log-food') ? 'active' : ''}`}
-              >
-                Log Food
-              </Link>
-              <Link 
-                to="/saved-plans" 
-                className={`nav-link ${isActive('/saved-plans') ? 'active' : ''}`}
-              >
-                Saved Plans
-              </Link>
-              <Link 
-                to="/about" 
-                className={`nav-link ${isActive('/about') ? 'active' : ''}`}
-              >
+              {!token && (
+                <Link to="/" className={`nav-link ${isActive('/') ? 'active' : ''}`}>
+                  Home
+                </Link>
+              )}
+              
+              {token && (
+                <>
+                  <Link to="/dashboard" className={`nav-link ${isActive('/dashboard') ? 'active' : ''}`}>
+                    Dashboard
+                  </Link>
+                  <Link to="/diet-planner" className={`nav-link ${isActive('/diet-planner') ? 'active' : ''}`}>
+                    Diet Planner
+                  </Link>
+                  <Link to="/water-tracking" className={`nav-link ${isActive('/water-tracking') ? 'active' : ''}`}>
+                    Water
+                  </Link>
+                  <Link to="/exercise-logging" className={`nav-link ${isActive('/exercise-logging') ? 'active' : ''}`}>
+                    Exercise
+                  </Link>
+                  <Link to="/log-food" className={`nav-link ${isActive('/log-food') ? 'active' : ''}`}>
+                    Log Food
+                  </Link>
+                  <Link to="/analytics" className={`nav-link ${isActive('/analytics') ? 'active' : ''}`}>
+                    Summary
+                  </Link>
+                </>
+              )}
+              
+              <Link to="/about" className={`nav-link ${isActive('/about') ? 'active' : ''}`}>
                 About
               </Link>
             </div>
 
             <div className="navbar-actions">
               {!token ? (
-                <button 
-                  className="nav-button secondary"
-                  onClick={() => setShowLogin(true)}
-                >
+                <button className="nav-button primary" onClick={() => setShowLogin(true)}>
                   Login
                 </button>
               ) : (
@@ -82,18 +82,14 @@ const Navbar = ({ setShowLogin }) => {
                     onClick={() => setShowProfileDropdown(!showProfileDropdown)}
                   />
                   {showProfileDropdown && (
-                    <ul className="nav-profile-dropdown">
-                      <li onClick={() => navigate('/saved-plans')}>
-                        <i className="fas fa-book"></i>
+                    <ul className="nav-profile-dropdown">                      
+                      <li onClick={() => { navigate('/profile'); setShowProfileDropdown(false); }}>
+                        <i className="fas fa-user-edit"></i>
+                        <span>Edit Profile</span>
+                      </li>
+                      <li onClick={() => { navigate('/saved-plans'); setShowProfileDropdown(false); }}>
+                        <i className="fas fa-bookmark"></i>
                         <span>Saved Plans</span>
-                      </li>
-                      <li onClick={() => navigate('/profile')}>
-                        <i className="fas fa-user"></i>
-                        <span>Profile</span>
-                      </li>
-                      <li onClick={() => navigate('/log-food')}>
-                        <i className="fas fa-utensils"></i>
-                        <span>Log Food</span>
                       </li>
                       <hr />
                       <li onClick={handleLogout}>
@@ -106,10 +102,7 @@ const Navbar = ({ setShowLogin }) => {
               )}
             </div>
 
-            <button 
-              className="mobile-menu-button" 
-              onClick={toggleMobileMenu}
-            >
+            <button className="mobile-menu-button" onClick={toggleMobileMenu}>
               {showMobileMenu ? <FaTimes /> : <FaBars />}
             </button>
           </div>
@@ -119,75 +112,62 @@ const Navbar = ({ setShowLogin }) => {
       <div className={`mobile-menu ${showMobileMenu ? 'active' : ''}`}>
         <div className="mobile-menu-header">
           <Link to="/" className="navbar-brand">
-            <span>Bytes</span> Diet Planner
+            <span>Calorix</span> Diet Planner
           </Link>
-          <button 
-            className="mobile-menu-button" 
-            onClick={toggleMobileMenu}
-          >
+          <button className="mobile-menu-button" onClick={toggleMobileMenu}>
             <FaTimes />
           </button>
         </div>
 
         <div className="mobile-menu-links">
-          <Link 
-            to="/" 
-            className={`nav-link ${isActive('/') ? 'active' : ''}`}
-            onClick={toggleMobileMenu}
-          >
-            Home
-          </Link>
-          <Link 
-            to="/profile" 
-            className={`nav-link ${isActive('/profile') ? 'active' : ''}`}
-            onClick={toggleMobileMenu}
-          >
-            Create Plan
-          </Link>
-          <Link 
-            to="/log-food" 
-            className={`nav-link ${isActive('/log-food') ? 'active' : ''}`}
-            onClick={toggleMobileMenu}
-          >
-            Log Food
-          </Link>
-          <Link 
-            to="/saved-plans" 
-            className={`nav-link ${isActive('/saved-plans') ? 'active' : ''}`}
-            onClick={toggleMobileMenu}
-          >
-            Saved Plans
-          </Link>
-          <Link 
-            to="/about" 
-            className={`nav-link ${isActive('/about') ? 'active' : ''}`}
-            onClick={toggleMobileMenu}
-          >
+          {!token && (
+            <Link to="/" className={`nav-link ${isActive('/') ? 'active' : ''}`} onClick={toggleMobileMenu}>
+              Home
+            </Link>
+          )}
+          
+          {token && (
+            <>
+              <Link to="/dashboard" className={`nav-link ${isActive('/dashboard') ? 'active' : ''}`} onClick={toggleMobileMenu}>
+                Dashboard
+              </Link>
+              <Link to="/diet-planner" className={`nav-link ${isActive('/diet-planner') ? 'active' : ''}`} onClick={toggleMobileMenu}>
+                Diet Planner
+              </Link>
+              <Link to="/water-tracking" className={`nav-link ${isActive('/water-tracking') ? 'active' : ''}`} onClick={toggleMobileMenu}>
+                Water
+              </Link>
+              <Link to="/exercise-logging" className={`nav-link ${isActive('/exercise-logging') ? 'active' : ''}`} onClick={toggleMobileMenu}>
+                Exercise
+              </Link>
+              <Link to="/log-food" className={`nav-link ${isActive('/log-food') ? 'active' : ''}`} onClick={toggleMobileMenu}>
+                Log Food
+              </Link>
+              <Link to="/meal-tracker" className={`nav-link ${isActive('/meal-tracker') ? 'active' : ''}`} onClick={toggleMobileMenu}>
+                Summary
+              </Link>
+            </>
+          )}
+          
+          <Link to="/about" className={`nav-link ${isActive('/about') ? 'active' : ''}`} onClick={toggleMobileMenu}>
             About
           </Link>
         </div>
 
         <div className="mobile-menu-actions">
           {!token ? (
-            <button 
-              className="nav-button secondary"
-              onClick={() => {
-                setShowLogin(true);
-                toggleMobileMenu();
-              }}
-            >
+            <button className="nav-button primary" onClick={() => { setShowLogin(true); toggleMobileMenu(); }}>
               Login
             </button>
           ) : (
-            <div className="navbar-profile">
-              <FaUserCircle 
-                className="profile-icon"
-                onClick={() => {
-                  setShowProfileDropdown(!showProfileDropdown);
-                  toggleMobileMenu();
-                }}
-              />
-            </div>
+            <>
+              <button className="nav-button secondary" style={{ marginBottom: '0.5rem' }} onClick={() => { navigate('/profile'); toggleMobileMenu(); }}>
+                Edit Profile
+              </button>
+              <button className="nav-button secondary" onClick={() => { handleLogout(); toggleMobileMenu(); }}>
+                Logout
+              </button>
+            </>
           )}
         </div>
       </div>

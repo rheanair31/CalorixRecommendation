@@ -1,6 +1,11 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 const mealPlanSchema = new mongoose.Schema({
+  userId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'user', 
+    required: true 
+  },
   userProfile: {
     age: { type: Number, required: true },
     sex: { type: String, required: true },
@@ -91,6 +96,8 @@ const mealPlanSchema = new mongoose.Schema({
     }
   },
   createdAt: { type: Date, default: Date.now }
-});
+}, { timestamps: true });
 
-module.exports = mongoose.model('MealPlan', mealPlanSchema); 
+const MealPlan = mongoose.models.MealPlan || mongoose.model('MealPlan', mealPlanSchema);
+
+export default MealPlan;

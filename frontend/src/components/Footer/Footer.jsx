@@ -9,7 +9,7 @@ const Footer = () => {
       <Container>
         <Row className="py-4">
           <Col md={4} className="mb-4 mb-md-0">
-            <h5 className="text-primary mb-3 fw-bold">Bytes Diet Planner</h5>
+            <h5 className="text-primary mb-3 fw-bold">Calorix Diet Planner</h5>
             <p className="footer-text">
               Your personalized diet planning companion. Get customized meal plans based on your preferences and goals.
             </p>
@@ -35,7 +35,7 @@ const Footer = () => {
           <Col md={3}>
             <h6 className="mb-3 fw-bold">Contact Us</h6>
             <ul className="list-unstyled">
-              <li className="footer-text"><span className="d-md-none">📧</span> Email: support@bytesdiet.com</li>
+              <li className="footer-text"><span className="d-md-none">📧</span> Email: support@Calorixdiet.com</li>
               <li className="footer-text"><span className="d-md-none">📞</span> Phone: (123) 456-7890</li>
             </ul>
           </Col>
@@ -43,7 +43,7 @@ const Footer = () => {
         <hr className="footer-divider" />
         <Row className="py-3">
           <Col className="text-center">
-            <small className="footer-text">© {new Date().getFullYear()} Bytes Diet Planner. All rights reserved.</small>
+            <small className="footer-text">© {new Date().getFullYear()} Calorix Diet Planner. All rights reserved.</small>
           </Col>
         </Row>
       </Container>
